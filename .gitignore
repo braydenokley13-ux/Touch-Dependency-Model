@@ -10,8 +10,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
 parts/
 sdist/
 var/
@@ -19,6 +17,8 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+# NOTE: removed Python build dirs `lib/` and `lib64/` from ignore list because
+# the Next.js frontend imports from `lib/` (shared TS types).
 
 # Virtual environments
 venv/
@@ -36,9 +36,24 @@ env/
 # Jupyter Notebook
 .ipynb_checkpoints/
 
-# Model files (large, generated)
-models/*.pkl
+# Model artifacts: the trained .pkl files are committed so Vercel can serve them.
+# The training_residuals.csv is a large diagnostic artifact and is ignored.
+models/training_residuals.csv
 models/*.joblib
+
+# Next.js / Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
+# Vercel
+.vercel/
+
+# Environment files
+.env
+.env.local
+.env*.local
 
 # OS
 .DS_Store

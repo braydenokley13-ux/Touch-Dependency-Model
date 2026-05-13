@@ -87,13 +87,58 @@ python tdm_cli.py batch --input roster.csv --output reports.csv
 python tdm_cli.py interactive
 ```
 
-#### Web Application
+#### Web Application (Streamlit)
 
 ```bash
 streamlit run app.py
 ```
 
 Then open http://localhost:8501 in your browser.
+
+#### Web Application (Next.js + Vercel)
+
+A production-ready web frontend lives at the repo root and a Python serverless
+function at `api/evaluate.py` runs the actual TDM ensemble. Models are bundled
+with the function via `vercel.json#functions.includeFiles`, so no external
+backend is required.
+
+**Local development:**
+
+```bash
+# 1. Train the model so models/*.pkl exist
+python train_model.py
+
+# 2. Install JS deps and start the dev server
+npm install
+npm run dev          # Next.js on http://localhost:3000
+```
+
+For local API testing the easiest path is `vercel dev` (from the
+[Vercel CLI](https://vercel.com/docs/cli)) which serves both the Next.js app
+and the Python function together. Otherwise you can mock `/api/evaluate` or
+hit the Python handler directly.
+
+**Deploy to Vercel:**
+
+1. Push this repo to GitHub.
+2. Import the project in Vercel — the framework is auto-detected as Next.js.
+3. Make sure the trained model files in `models/*.pkl` are committed to the
+   repo (they're tiny, ~520 KB total). Vercel will bundle them with the
+   `api/evaluate.py` serverless function based on `vercel.json`.
+4. Deploy. The frontend lives at `/` and the inference endpoint at
+   `POST /api/evaluate`.
+
+**API contract:**
+
+```bash
+curl -X POST https://<your-deployment>.vercel.app/api/evaluate \
+  -H 'Content-Type: application/json' \
+  -d '{"Player":"Sample","FG":373,"FGA":1024,"FT":285,"FTA":374,
+       "3P":50,"3PA":150,"AST":247,"MP":2800,"PTS":1031,"TOV":150,
+       "Age":25,"Pos":"G"}'
+```
+
+Returns the same evaluation dictionary as `TouchDependencyModel.evaluate_player`.
 
 ## Understanding the Output
 

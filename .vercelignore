@@ -1,0 +1,10 @@
+data/
+tests/
+*.md
+!README.md
+app.py
+tdm_cli.py
+train_model.py
+models/training_residuals.csv
+__pycache__/
+.pytest_cache/
